@@ -1,0 +1,105 @@
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <vector>
+#include <limits>
+
+struct Subject {
+    std::string name;
+    double gradePoint;
+    double credits;
+};
+
+int readInt(const std::string &prompt) {
+    int x;
+    while (true) {
+        std::cout << prompt;
+        if (std::cin >> x && x > 0) {
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            return x;
+        }
+        std::cout << "Please enter a positive integer.\n";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+}
+
+double readDouble(const std::string &prompt) {
+    double x;
+    while (true) {
+        std::cout << prompt;
+        if (std::cin >> x && x >= 0.0) {
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            return x;
+        }
+        std::cout << "Please enter a non-negative number.\n";
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+}
+
+int main() {
+    std::string studentName;
+    std::cout << "Enter student name: ";
+    std::getline(std::cin, studentName);
+    while (studentName.empty()) {
+        std::cout << "Student name cannot be empty. Enter student name: ";
+        std::getline(std::cin, studentName);
+    }
+
+    int n = readInt("Enter number of subjects: ");
+
+    std::vector<Subject> subjects;
+    subjects.reserve(n);
+
+    for (int i = 1; i <= n; ++i) {
+        Subject s;
+        std::cout << "\nSubject " << i << " name: ";
+        std::getline(std::cin, s.name);
+        while (s.name.empty()) {
+            std::cout << "Subject name cannot be empty. Enter subject " << i << " name: ";
+            std::getline(std::cin, s.name);
+        }
+
+        s.gradePoint = readDouble("Grade point for " + s.name + " (e.g., 9.0): ");
+        s.credits    = readDouble("Credits for " + s.name + " (e.g., 3): ");
+
+        subjects.push_back(s);
+    }
+
+    double totalWeighted = 0.0;
+    double totalCredits = 0.0;
+    for (const auto &sub : subjects) {
+        totalWeighted += sub.gradePoint * sub.credits;
+        totalCredits += sub.credits;
+    }
+
+    if (totalCredits <= 0.0) {
+        std::cout << "\nTotal credits are zero. Cannot compute CGPA.\n";
+        return 0;
+    }
+
+    double cgpa = totalWeighted / totalCredits;
+
+    std::cout << "\n========================================\n";
+    std::cout << "Student Name: " << studentName << "\n";
+    std::cout << "----------------------------------------\n";
+    std::cout << std::left << std::setw(25) << "Subject"
+              << std::right << std::setw(12) << "Grade Point"
+              << std::right << std::setw(12) << "Credits" << "\n";
+    std::cout << "----------------------------------------\n";
+
+    std::cout << std::fixed << std::setprecision(2);
+    for (const auto &sub : subjects) {
+        std::cout << std::left << std::setw(25) << sub.name
+                  << std::right << std::setw(12) << sub.gradePoint
+                  << std::right << std::setw(12) << sub.credits << "\n";
+    }
+
+    std::cout << "----------------------------------------\n";
+    std::cout << "Total Credits: " << totalCredits << "\n";
+    std::cout << "CGPA: " << cgpa << "\n";
+    std::cout << "========================================\n";
+
+    return 0;
+}
