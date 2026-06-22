@@ -1,0 +1,187 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <limits>
+#include <cstdlib>
+
+using namespace std;
+
+void login();
+void registration();
+void forgot();
+
+ int main(){
+    int c;
+    do {
+        cout << "\t\t\t__________________________________________________________\n\n\n";
+        cout << "\t\t\t               Welcome to the login page                   \n\n\n";
+        cout << "\t\t\t_______________          MENU           ____________________\n\n";
+        cout << "\t| Press 1 to LOGIN                       |" << endl;
+        cout << "\t| Press 2 to REGISTER                    |" << endl;
+        cout << "\t| Press 3 if you forgot PASSWORD         |" << endl;
+        cout << "\t| Press 4 to EXIT                        |" << endl;
+        cout << "please enter your choice : ";
+        if (!(cin >> c)) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            c = 0;
+        }
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (c)
+        {
+            case 1:
+                login();
+                break;
+            case 2:
+                registration();
+                break;
+            case 3:
+                forgot();
+                break;
+            case 4:
+                cout << "\t\t\t   THANK YOU!   \n\n";
+                break;
+            default:
+                #ifdef _WIN32
+                system("cls");
+                #else
+                system("clear");
+                #endif
+                cout << "\t\t\t  Please select from the options given above \n" << endl;
+        }
+    } while (c != 4);
+
+    return 0;
+}
+
+void login()
+{
+    bool found = false;
+    string userId, password, id, pass;
+    #ifdef _WIN32
+    system("cls");
+    #else
+    system("clear");
+    #endif
+    cout << "\t\t\t Please enter the username and password  :  " << endl;
+    cout << "Username: ";
+    cin >> userId;
+    cout << "Password: ";
+    cin >> password;
+
+    ifstream input("record.txt");
+    if (!input) {
+        cout << "\nNo records found. Please register first.\n\n";
+        return;
+    }
+
+    while (input >> id >> pass) {
+        if (id == userId && pass == password) {
+            found = true;
+            break;
+        }
+    }
+    input.close();
+
+    if (found) {
+        cout << "\n" << userId << "  Your login is successful. Thanks for logging in!\n\n";
+    } else {
+        cout << "\nLOGIN ERROR: Please check your username and password.\n\n";
+    }
+}
+
+void registration()
+{
+    string ruserId, rpassword;
+    cout << "\t\t\t Enter the username  :  ";
+    cin >> ruserId;
+    cout << "\t\t\t Enter the password :  ";
+    cin >> rpassword;
+
+    ofstream f1;
+    f1.open("record.txt", ios::app);
+    if (!f1.is_open()) {
+        ofstream create("record.txt");
+        if (!create.is_open()) {
+            cout << "\nUnable to open or create record file for writing.\n";
+            cout << "Possible causes: no write permission in the current folder or running in a restricted environment.\n\n";
+            return;
+        }
+        create.close();
+        f1.open("record.txt", ios::app);
+        if (!f1.is_open()) {
+            cout << "\nUnable to open record file for writing after creating it.\n";
+            cout << "Please run the program in a folder where you have write permission.\n\n";
+            return;
+        }
+    }
+
+    f1 << ruserId << ' ' << rpassword << '\n';
+    f1.close();
+
+    #ifdef _WIN32
+    system("cls");
+    #else
+    system("clear");
+    #endif
+    cout << "\n\t\t\t Registration is successful \n\n";
+}
+
+void forgot()
+{
+    int option;
+    #ifdef _WIN32
+    system("cls");
+    #else
+    system("clear");
+    #endif
+    cout << "\t\t\t You forgot the password? No worries!\n";
+    cout << "press 1 to search your ID by username" << endl;
+    cout << "press 2 to go back to main menu " << endl;
+    cout << "\t\t\t Enter your choice : ";
+    if (!(cin >> option)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        option = 0;
+    }
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    switch (option)
+    {
+        case 1:
+        {
+            bool found = false;
+            string suserId, sId, spass;
+            cout << "\n\t\t\t Enter the username which you remember : ";
+            cin >> suserId;
+
+            ifstream f2("record.txt");
+            if (!f2) {
+                cout << "\nNo records found.\n\n";
+                return;
+            }
+
+            while (f2 >> sId >> spass) {
+                if (sId == suserId) {
+                    found = true;
+                    break;
+                }
+            }
+            f2.close();
+
+            if (found) {
+                cout << "\n\nYour account is found.\n";
+                cout << "Your password is : " << spass << "\n\n";
+            } else {
+                cout << "\n\tSorry! Your account is not found.\n\n";
+            }
+            break;
+        }
+        case 2:
+            return;
+        default:
+            cout << "\t\t\t Wrong choice! Please try again\n" << endl;
+            forgot();
+    }
+}
