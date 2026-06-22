@@ -1,1 +1,0 @@
-# CodeAlpha-Internship-project-C-programming-
